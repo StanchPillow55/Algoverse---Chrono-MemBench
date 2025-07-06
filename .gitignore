@@ -2,3 +2,7 @@
 .DS_Store
 .venv/
 .DS_Store
+/data/
+/outputs/
+.venv/
+.DS_Store
