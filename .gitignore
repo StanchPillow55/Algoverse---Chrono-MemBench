@@ -3,7 +3,7 @@ data/models/gemma-2b/
 data/models/llama3-8b/
 data/models/llava-1.6-7b/
 
-# DVC specific ignores
+# DVC specific ignores (files within the .dvc/ directory that shouldn't be tracked)
 .dvc/tmp/
 .dvc/cache/
 .dvc/plots/
@@ -16,6 +16,7 @@ data/models/llava-1.6-7b/
 .venv/
 __pycache__/
 *.pyc
-.DS_Store # macOS
-/data/
-/outputs/
+.DS_Store          # Ignore .DS_Store files in the current directory and subdirectories
+**/.DS_Store      # This is more robust, ignores .DS_Store anywhere
+
+/outputs/          # Ignore top-level outputs directory
