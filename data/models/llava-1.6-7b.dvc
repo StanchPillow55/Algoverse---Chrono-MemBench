@@ -1,0 +1,6 @@
+outs:
+- md5: f3bf35bee86ffdac47c09b58528d6d4d.dir
+  size: 15135962150
+  nfiles: 52
+  hash: md5
+  path: llava-1.6-7b

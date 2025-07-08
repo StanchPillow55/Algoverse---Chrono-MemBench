@@ -1,0 +1,6 @@
+outs:
+- md5: c273d957cc2236d7a96ba7da2234a31b.dir
+  size: 21606
+  nfiles: 15
+  hash: md5
+  path: gemma-2b

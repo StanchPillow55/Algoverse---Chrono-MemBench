@@ -1,0 +1,6 @@
+outs:
+- md5: 12bb3bfbd3eac0292ea1788983ccc3e4.dir
+  size: 32132571729
+  nfiles: 52
+  hash: md5
+  path: llama3-8b
