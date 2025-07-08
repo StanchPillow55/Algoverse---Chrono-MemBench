@@ -1,8 +1,21 @@
+# Ignore the actual model data files (let DVC manage them)
+data/models/gemma-2b/
+data/models/llama3-8b/
+data/models/llava-1.6-7b/
+
+# DVC specific ignores
+.dvc/tmp/
+.dvc/cache/
+.dvc/plots/
+.dvc/config.local
+
+# Hugging Face cache
+.hf_cache/
+
+# Other common ignores
 .venv/
-.DS_Store
-.venv/
-.DS_Store
+__pycache__/
+*.pyc
+.DS_Store # macOS
 /data/
 /outputs/
-.venv/
-.DS_Store
