@@ -1,0 +1,5 @@
+outs:
+- md5: 12cd77e30e3be80ca841090ee9d3fb07
+  size: 25038777
+  hash: md5
+  path: microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl

@@ -1,0 +1,5 @@
+outs:
+- md5: 6d07d128495265163aca70e7fbaf326a
+  size: 266106844
+  hash: md5
+  path: HuggingFaceFW_fineweb_edu_edu_web_train.jsonl

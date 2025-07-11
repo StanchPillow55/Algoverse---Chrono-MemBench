@@ -1,0 +1,15 @@
+{
+  "total_datasets": 4,
+  "datasets": [
+    "data/raw/HuggingFaceFW_fineweb_edu_edu_web_train.jsonl",
+    "data/raw/wikitext_wiki103_train.jsonl",
+    "data/raw/microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl",
+    "data/raw/bookcorpus_books_train.jsonl"
+  ],
+  "description": {
+    "fineweb_edu": "High-quality educational web content",
+    "wikitext": "Wikipedia articles for language modeling",
+    "orca_math": "Mathematical reasoning problems",
+    "bookcorpus": "Book text for language modeling"
+  }
+}
