@@ -1,0 +1,105 @@
+# Base Training Configuration
+# This config supports Gemma-2B, Llama-3-8B, and LLaVA-1.6
+
+# Model Configuration
+model:
+  # Options: "gemma-2b", "llama-3-8b", "llava-1.6-7b"
+  type: "gemma-2b"
+  
+  # Model source - either local path or HuggingFace model ID
+  source: "local"  # "local" or "huggingface"
+  
+  # Model paths/IDs for each model type
+  paths:
+    gemma-2b:
+      local: "data/models/gemma-2b"
+      huggingface: "google/gemma-2b"
+    llama-3-8b:
+      local: "data/models/llama3-8b"
+      huggingface: "meta-llama/Meta-Llama-3-8B"
+    llava-1.6-7b:
+      local: "data/models/llava-1.6-7b"
+      huggingface: "llava-hf/llava-1.6-mistral-7b-hf"
+
+# Dataset Configuration  
+dataset:
+  # Available datasets
+  sources:
+    - "data/raw/HuggingFaceFW_fineweb_edu_edu_web_train.jsonl"
+    - "data/raw/wikitext_wiki103_train.jsonl"
+    - "data/raw/microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl"
+    - "data/raw/bookcorpus_books_train.jsonl"
+  
+  # Dataset mixing ratios (will be normalized)
+  mixing_ratios:
+    fineweb_edu: 0.5      # 50% educational content
+    wikitext: 0.2         # 20% Wikipedia
+    orca_math: 0.2        # 20% math problems
+    bookcorpus: 0.1       # 10% books
+  
+  # Data processing
+  max_length: 2048
+  train_split: 0.9
+  val_split: 0.1
+  shuffle: true
+  
+# Training Configuration
+training:
+  # Basic settings
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 5e-5
+  warmup_steps: 100
+  max_steps: 1000
+  eval_steps: 100
+  save_steps: 500
+  
+  # Optimization
+  optimizer: "adamw"
+  scheduler: "cosine"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # Training type
+  training_type: "fine_tuning"  # "fine_tuning", "lora", "full_training"
+  
+  # LoRA settings (if using LoRA)
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+
+# Environment Configuration
+environment:
+  # Compute environment
+  platform: "colab"  # "colab", "local", "cloud"
+  
+  # Output paths
+  output_dir: "outputs"
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+  
+  # Logging
+  logging:
+    wandb: false
+    tensorboard: true
+    console_log_level: "INFO"
+    
+  # Hardware
+  mixed_precision: "fp16"  # "fp16", "bf16", "fp32"
+  dataloader_num_workers: 2
+  pin_memory: true
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 1000  # Max samples for evaluation
+  generate_samples: 5      # Number of text samples to generate during eval
+  
+# Colab-specific settings
+colab:
+  mount_drive: true
+  drive_path: "/content/drive/MyDrive/chrono-membench"
+  install_requirements: true
+  setup_wandb: false

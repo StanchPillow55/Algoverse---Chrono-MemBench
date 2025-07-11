@@ -1,0 +1,49 @@
+# Llama-3-8B Fine-tuning Configuration
+# Inherits from training_base.yaml and overrides for Llama-3-8B
+
+# Model Configuration
+model:
+  type: "llama-3-8b"
+  source: "local"  # Change to "huggingface" if you want to stream
+
+# Dataset Configuration - Optimized for Llama-3-8B
+dataset:
+  # Balanced mix for comprehensive language understanding
+  mixing_ratios:
+    fineweb_edu: 0.4      # 40% educational content
+    wikitext: 0.25        # 25% Wikipedia
+    orca_math: 0.25       # 25% math problems
+    bookcorpus: 0.1       # 10% books
+  
+  max_length: 4096        # Llama-3 context length
+
+# Training Configuration - Optimized for 8B parameters
+training:
+  batch_size: 2           # Smaller batch size for larger model
+  gradient_accumulation_steps: 16
+  learning_rate: 5e-5     # Conservative LR for larger model
+  warmup_steps: 100
+  max_steps: 1500
+  eval_steps: 150
+  save_steps: 300
+  
+  # Training type
+  training_type: "lora"   # LoRA is essential for 8B model efficiency
+  
+  # LoRA settings optimized for Llama-3-8B
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# Environment Configuration
+environment:
+  mixed_precision: "bf16"   # BF16 is better for Llama-3
+  dataloader_num_workers: 1 # Reduced for memory efficiency
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 500    # Smaller eval set to save memory
+  generate_samples: 3

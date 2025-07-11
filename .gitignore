@@ -1,9 +1,153 @@
-# Ignore the actual model data files (let DVC manage them)
-data/models/gemma-2b/
-data/models/llama3-8b/
-data/models/llava-1.6-7b/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# DVC specific ignores (files within the .dvc/ directory that shouldn't be tracked)
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+outputs/
+checkpoints/
+logs/
+wandb/
+*.log
+
+# Model files (too large for git)
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# Data files (managed by DVC)
+data/models/
+data/processed/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+configs/temp_*.yaml
+
+# DVC
 .dvc/tmp/
 .dvc/cache/
 .dvc/plots/
@@ -11,12 +155,3 @@ data/models/llava-1.6-7b/
 
 # Hugging Face cache
 .hf_cache/
-
-# Other common ignores
-.venv/
-__pycache__/
-*.pyc
-.DS_Store          # Ignore .DS_Store files in the current directory and subdirectories
-**/.DS_Store      # This is more robust, ignores .DS_Store anywhere
-
-/outputs/          # Ignore top-level outputs directory

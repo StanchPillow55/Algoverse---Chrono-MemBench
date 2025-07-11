@@ -1,0 +1,167 @@
+# Chrono-MemBench Configuration
+# Enhanced training configuration for temporal dropout and Route-SAE integration
+
+# Model Configuration
+model:
+  type: "gemma-2b"  # Start with smaller model for faster experimentation
+  source: "huggingface"  # Use HuggingFace for easier access
+  
+  paths:
+    gemma-2b:
+      local: "data/models/gemma-2b"
+      huggingface: "google/gemma-2b"
+    llama-3-8b:
+      local: "data/models/llama3-8b"
+      huggingface: "meta-llama/Meta-Llama-3-8B"
+
+# Dataset Configuration - Using existing datasets
+dataset:
+  sources:
+    - "data/raw/HuggingFaceFW_fineweb_edu_edu_web_train.jsonl"
+    - "data/raw/wikitext_wiki103_train.jsonl"
+    - "data/raw/microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl"
+    - "data/raw/bookcorpus_books_train.jsonl"
+  
+  # Optimized mixing ratios for memory feature analysis
+  mixing_ratios:
+    fineweb_edu: 0.4      # 40% educational content - good for knowledge features
+    wikitext: 0.3         # 30% Wikipedia - structured factual content
+    orca_math: 0.2        # 20% math problems - reasoning features
+    bookcorpus: 0.1       # 10% books - narrative/literary features
+  
+  # Enhanced data processing for chrono-membench
+  max_length: 2048
+  train_split: 0.85      # Slightly more training data
+  val_split: 0.15        # More validation for better temporal purity measurements
+  shuffle: true
+
+# Training Configuration - Optimized for temporal analysis
+training:
+  # Batch configuration
+  batch_size: 2          # Smaller batch for memory efficiency with SAE
+  gradient_accumulation_steps: 16  # Maintain effective batch size
+  
+  # Learning configuration
+  learning_rate: 3e-5    # Lower learning rate for stable temporal features
+  warmup_steps: 200      # More warmup for SAE stability
+  max_steps: 5000        # Increased steps for better temporal analysis
+  eval_steps: 250        # More frequent evaluation
+  save_steps: 500        # Save checkpoints every 500 steps
+  
+  # Optimization
+  optimizer: "adamw"
+  scheduler: "cosine"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # Use LoRA for efficient training
+  training_type: "lora"
+  
+  # LoRA configuration optimized for feature extraction
+  lora:
+    r: 32              # Higher rank for better feature representation
+    alpha: 64          # Corresponding alpha
+    dropout: 0.05      # Lower dropout for more stable features
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# Environment Configuration
+environment:
+  platform: "local"     # Assume local/cloud training
+  
+  # Output configuration
+  output_dir: "outputs/chrono"
+  checkpoint_dir: "outputs/chrono/checkpoints"
+  log_dir: "outputs/chrono/logs"
+  
+  # Logging configuration
+  logging:
+    wandb: true         # Enable wandb for dashboard
+    tensorboard: true   # Also keep tensorboard
+    console_log_level: "INFO"
+  
+  # Hardware optimization
+  mixed_precision: "fp16"
+  dataloader_num_workers: 4
+  pin_memory: true
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss", "temporal_purity"]
+  eval_dataset_size: 2000    # Larger eval set for better purity measurements
+  generate_samples: 10       # More samples for analysis
+
+# Chrono-MemBench Specific Settings
+chrono:
+  # Temporal dropout configuration
+  temporal_dropout:
+    enabled: true
+    initial_rate: 0.2
+    schedule: "cosine"        # cosine, linear, constant
+    min_rate: 0.05           # Minimum dropout rate
+  
+  # Route-SAE configuration
+  route_sae:
+    enabled: true
+    latent_dim: 2048         # Smaller latent dim for Gemma-2B
+    sparsity_weight: 0.1
+    reconstruction_weight: 1.0
+    update_frequency: 100    # Update SAE every 100 steps
+  
+  # Feature alignment configuration
+  feature_alignment:
+    enabled: true
+    weight: 0.05             # Lower weight to not dominate loss
+    alignment_type: "attention_diversity"
+  
+  # Checkpointing for temporal analysis
+  checkpointing:
+    checkpoint_every_n_steps: 500  # Every 500 steps
+    max_checkpoints: 10            # Keep 10 checkpoints
+    save_features: true            # Save feature representations
+    save_sae_state: true           # Save SAE state
+  
+  # Temporal purity computation
+  temporal_purity:
+    enabled: true
+    compute_every_n_steps: 250     # Compute every 250 steps
+    similarity_threshold: 0.8      # Threshold for feature consistency
+    window_size: 3                 # Number of checkpoints to compare
+  
+  # Dashboard and monitoring
+  monitoring:
+    wandb_project: "chrono-membench"
+    wandb_entity: null             # Set to your wandb entity
+    dashboard_enabled: true
+    update_interval: 100           # Update every 100 steps
+    
+    # Metrics to track
+    track_metrics:
+      - "temporal_purity"
+      - "feature_birth_rate"
+      - "sae_reconstruction_loss"
+      - "sae_sparsity_loss"
+      - "attention_diversity"
+      - "memory_absorption"
+
+# Experimental settings
+experiment:
+  name: "chrono-membench-v1"
+  description: "Temporal dropout with Route-SAE on mixed educational datasets"
+  tags: ["chrono", "temporal-dropout", "route-sae", "gemma-2b"]
+  
+  # Ablation studies configuration
+  ablation:
+    enabled: false           # Set to true to run ablations
+    configurations:
+      - "no_temporal_dropout"
+      - "no_sae"
+      - "no_feature_alignment"
+      - "different_mixing_ratios"
+  
+  # Reproducibility
+  seed: 42
+  deterministic: true
+  
+  # Resource limits
+  max_memory_gb: 24        # Maximum memory usage
+  max_training_hours: 12   # Maximum training time

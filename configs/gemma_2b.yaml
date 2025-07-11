@@ -1,0 +1,49 @@
+# Gemma-2B Fine-tuning Configuration
+# Inherits from training_base.yaml and overrides for Gemma-2B
+
+# Model Configuration
+model:
+  type: "gemma-2b"
+  source: "local"  # Change to "huggingface" if you want to stream
+
+# Dataset Configuration - Optimized for Gemma-2B
+dataset:
+  # Focus on educational and reasoning content for Gemma-2B
+  mixing_ratios:
+    fineweb_edu: 0.6      # 60% educational content
+    wikitext: 0.2         # 20% Wikipedia
+    orca_math: 0.15       # 15% math problems
+    bookcorpus: 0.05      # 5% books
+  
+  max_length: 2048        # Gemma-2B context length
+
+# Training Configuration - Optimized for 2B parameters
+training:
+  batch_size: 8           # Larger batch size for smaller model
+  gradient_accumulation_steps: 4
+  learning_rate: 1e-4     # Slightly higher LR for smaller model
+  warmup_steps: 200
+  max_steps: 2000
+  eval_steps: 200
+  save_steps: 500
+  
+  # Training type
+  training_type: "lora"   # LoRA is efficient for Gemma-2B
+  
+  # LoRA settings optimized for Gemma-2B
+  lora:
+    r: 32
+    alpha: 64
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# Environment Configuration
+environment:
+  mixed_precision: "fp16"
+  dataloader_num_workers: 2
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 1000
+  generate_samples: 3
