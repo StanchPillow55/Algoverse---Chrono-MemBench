@@ -80,9 +80,10 @@ environment:
     console_log_level: "INFO"
   
   # Hardware optimization
-  mixed_precision: "fp16"
-  dataloader_num_workers: 4
-  pin_memory: true
+  mixed_precision: "fp16"    # Use fp16 for MPS compatibility
+  dataloader_num_workers: 4  # Good for M1/M2 chips
+  pin_memory: false          # Set to false for MPS
+  device: "mps"              # Use MPS for Apple Silicon
 
 # Evaluation Configuration
 evaluation:

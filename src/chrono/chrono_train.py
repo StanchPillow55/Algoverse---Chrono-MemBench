@@ -32,8 +32,8 @@ from transformers import (
 from peft import LoraConfig, get_peft_model, TaskType
 
 # Import from existing modules
-from data_loader import DatasetConfig, create_data_loaders
-from train import ModelManager, TrainingManager, load_config
+from chrono.data_loader import DatasetConfig, create_data_loaders
+from chrono.train import ModelManager, TrainingManager, load_config
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

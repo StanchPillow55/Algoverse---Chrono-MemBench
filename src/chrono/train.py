@@ -25,7 +25,7 @@ from transformers import (
 from peft import LoraConfig, get_peft_model, TaskType
 import numpy as np
 
-from data_loader import DatasetConfig, create_data_loaders
+from chrono.data_loader import DatasetConfig, create_data_loaders
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
