@@ -4,7 +4,13 @@
 # Model Configuration
 model:
   type: "llama-3-8b"
-  source: "local"  # Change to "huggingface" if you want to stream
+  source: "huggingface"  # Use huggingface for easier access
+  
+  # Model paths/IDs for different sources
+  paths:
+    llama-3-8b:
+      local: "data/models/llama3-8b"
+      huggingface: "meta-llama/Meta-Llama-3-8B"
 
 # Dataset Configuration - Optimized for Llama-3-8B
 dataset:

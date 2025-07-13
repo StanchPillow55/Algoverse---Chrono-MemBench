@@ -4,7 +4,13 @@
 # Model Configuration
 model:
   type: "gemma-2b"
-  source: "local"  # Change to "huggingface" if you want to stream
+  source: "huggingface"  # Use huggingface for easier access
+  
+  # Model paths/IDs for different sources
+  paths:
+    gemma-2b:
+      local: "data/models/gemma-2b"
+      huggingface: "google/gemma-2b"
 
 # Dataset Configuration - Optimized for Gemma-2B
 dataset:

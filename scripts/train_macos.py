@@ -54,18 +54,41 @@ def optimize_for_macos(config_path: str):
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     
+    # Ensure model paths exist (critical fix for KeyError: 'paths')
+    if 'model' not in config:
+        config['model'] = {}
+    
+    # Add paths section if missing
+    if 'paths' not in config['model']:
+        config['model']['paths'] = {
+            'gemma-2b': {
+                'local': 'data/models/gemma-2b',
+                'huggingface': 'google/gemma-2b'
+            },
+            'llama-3-8b': {
+                'local': 'data/models/llama3-8b', 
+                'huggingface': 'meta-llama/Meta-Llama-3-8B'
+            }
+        }
+    
+    # Ensure environment section exists
+    if 'environment' not in config:
+        config['environment'] = {}
+    
     # Optimize for macOS/MPS
     config['environment']['pin_memory'] = False
     config['environment']['device'] = 'mps'
     config['environment']['mixed_precision'] = 'fp16'
+    config['environment']['dataloader_num_workers'] = 2  # Conservative for macOS
+    
+    # Ensure training section exists
+    if 'training' not in config:
+        config['training'] = {}
     
     # Conservative settings for local training
     config['training']['batch_size'] = 2
     config['training']['gradient_accumulation_steps'] = 8
     config['training']['max_steps'] = 1000  # Reasonable for local testing
-    
-    # Optimize data loading for macOS
-    config['environment']['dataloader_num_workers'] = 2  # Conservative for macOS
     
     # Save optimized config
     macos_config_path = config_path.replace('.yaml', '_macos.yaml')
