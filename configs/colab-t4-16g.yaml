@@ -1,0 +1,3 @@
+include: common.yaml
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 32

@@ -1,0 +1,7 @@
+include: common.yaml
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 64
+per_device_eval_batch_size: 1
+extra_pip: |
+  pip install bitsandbytes==0.43.1+cu111 \
+    -f https://colab-compat-ochre.s3.amazonaws.com/wheels.html
