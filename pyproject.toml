@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chatgpt2"
+version = "0.1.0"
+description = "A Two-Phase Framework for Tracking and Steering Memory Features in Large Language Models"
+authors = [
+    {name = "Bradley Haraguchi", email = "bradley.haraguchi@sjsu.edu"},
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.40.0",
+    "datasets>=2.15.0",
+    "tokenizers>=0.15.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "PyYAML>=6.0",
+    "tqdm>=4.65.0",
+    "scikit-learn>=1.3.0",
+]
+
+[project.optional-dependencies]
+train = [
+    "accelerate>=0.25.0",
+    "peft>=0.8.0",
+    "bitsandbytes>=0.42.0",
+    "tensorboard>=2.15.0",
+    "wandb>=0.16.0",
+    "flash-attn>=2.0.0; platform_system != 'Darwin'",
+    "triton>=2.0.0; platform_system != 'Darwin'",
+]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/StanchPillow55/Algoverse---Chrono-MemBench"
+"Bug Reports" = "https://github.com/StanchPillow55/Algoverse---Chrono-MemBench/issues"
+"Source" = "https://github.com/StanchPillow55/Algoverse---Chrono-MemBench"
+
+[project.scripts]
+chrono-train = "chatgpt2.chrono.chrono_train:main"
+chrono-cli = "chatgpt2.chrono_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
