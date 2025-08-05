@@ -1,0 +1,57 @@
+# ChronoSAE Training Configuration for Pythia-70M
+# Optimized for 8GB VRAM with gradient accumulation
+
+model:
+  d_model: 512               # Pythia-70M hidden dimension
+  d_sae: 2048               # SAE expansion factor ~4x
+  temporal_dropout_p: 0.15   # Temporal dropout probability
+  lambda_sparsity: 0.0003   # L1 sparsity regularization
+  beta_tpg: 0.001           # Temporal policy gradient coefficient
+
+training:
+  epochs: 2                 # Just 2 epochs for testing
+  batch_size: 8             # Smaller batch for testing
+  gradient_accumulation_steps: 2  # Smaller accumulation for testing
+  learning_rate: 0.001
+  warmup_steps: 1000
+  weight_decay: 0.0001
+  max_grad_norm: 1.0        # Gradient clipping
+  
+optimizers:
+  primary: "adamw"          # Primary optimizer
+  secondary: "lion"         # Secondary optimizer for comparison
+  adamw:
+    lr: 0.001
+    betas: [0.9, 0.999]
+    eps: 0.00000001
+    weight_decay: 0.0001
+  lion:
+    lr: 0.0003
+    betas: [0.9, 0.99]
+    weight_decay: 0.0001
+
+data:
+  dataset: "dummy"          # Use dummy data for now
+  num_samples: 200          # Small dataset for testing
+  seq_len: 32               # Shorter sequences for testing
+  train_split: 0.85
+  val_split: 0.15
+  num_workers: 0            # No multiprocessing for testing
+
+metrics:
+  log_interval: 50          # Log every N steps
+  metric_interval: 100      # Stream dial metrics every N steps
+  val_interval: 1000        # Validate every N steps
+  save_interval: 2000       # Save checkpoint every N steps
+
+system:
+  mixed_precision: true     # Enable AMP
+  compile_mode: "none"      # torch.compile mode: none/trace/compile
+  checkpoint_dir: "./outputs/checkpoints"
+  log_dir: "./outputs/logs"
+  metrics_dir: "./outputs/metrics"
+
+# Multi-GPU settings (if available)
+distributed:
+  backend: "nccl"
+  find_unused_parameters: false

@@ -119,7 +119,7 @@ class ICLPersistenceHook(BaseMetricHook):
                 cosine_sim = torch.nn.functional.cosine_similarity(
                     curr_flat.unsqueeze(0), prev_flat.unsqueeze(0), dim=1
                 ).item()
-                icl_persistence = max(0.0, cosine_sim)  # clamp to [0, 1]
+                icl_persistence = max(0.0, min(1.0, cosine_sim))  # clamp to [0, 1]
         
         # Cache current activations for next step
         if activations is not None:
