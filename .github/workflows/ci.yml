@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install conda
+      uses: goanpeca/setup-miniconda@v2
+      with:
+        activate-environment: chrono_membench_cpu
+        environment-file: environment.yml
+        auto-activate-base: false
+
+    - name: Install additional packages
+      run: |
+        conda install pip
+        pip install -e .
+
+    - name: Run smoke tests
+      run: |
+        pytest -q tests/smoke
+
+

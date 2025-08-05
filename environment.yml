@@ -1,0 +1,75 @@
+# Chrono-MemBench Conda Environment Configuration (CPU)
+# Default environment for macOS and CPU-only setups
+#
+# Usage:
+#   conda env create -f environment.yml
+#   conda env create -f environment-gpu.yml  # For GPU setup
+#
+# Or use the bootstrap script:
+#   python scripts/bootstrap_env.py
+
+name: chrono_membench_cpu
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.12
+
+  # PyTorch CPU-only
+  - pytorch=2.5.*
+  - torchvision
+  - torchaudio
+  - cpuonly
+
+  # Core ML/AI packages
+  - transformers>=4.40.0
+  - tokenizers>=0.21.0
+  - datasets>=2.15.0
+  - accelerate>=0.25.0
+  - peft>=0.8.0
+  - safetensors>=0.4.3
+  - huggingface_hub>=0.34.0
+
+  # Data science stack
+  - numpy>=1.24.0
+  - pandas>=2.0.0
+  - scikit-learn>=1.3.0
+  - matplotlib>=3.7.0
+  - seaborn>=0.12.0
+
+  # Development tools
+  - jupyter
+  - notebook
+  - jupyterlab
+  - ipywidgets
+
+  # Configuration and logging
+  - pyyaml>=6.0
+  - hydra-core>=1.3.0
+  - python-dotenv>=1.0.0
+  - rich>=13.0.0
+  - typer>=0.9.0
+
+  # Progress and utilities
+  - tqdm>=4.65.0
+  - psutil
+
+  # Testing and quality
+  - pytest>=7.0.0
+  - pytest-cov>=4.0.0
+  - pre-commit>=3.0.0
+  - black>=23.0.0
+  - isort>=5.12.0
+  - yapf>=0.32.0
+  - flake8>=6.0.0
+  - mypy>=1.0.0
+
+  # Monitoring
+  - tensorboard>=2.15.0
+  - wandb>=0.16.0
+
+  # CPU-specific packages
+  - pip
