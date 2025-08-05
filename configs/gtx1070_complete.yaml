@@ -1,0 +1,165 @@
+# Complete GTX 1070 Configuration for Chrono-MemBench
+# Optimized for 8GB VRAM with memory-efficient settings
+
+# Model Configuration
+model:
+  d_model: 2048              # Gemma-2B hidden dimension
+  d_sae: 8192               # SAE expansion factor ~4x
+  temporal_dropout_p: 0.1    # Temporal dropout probability (reduced for stability)
+  lambda_sparsity: 0.0001   # L1 sparsity regularization (reduced for memory)
+  beta_tpg: 0.0005          # Temporal policy gradient coefficient
+
+# Dataset Configuration
+dataset:
+  sources:
+    - "data/raw/HuggingFaceFW_fineweb_edu_edu_web_train.jsonl"
+    - "data/raw/wikitext_wiki103_train.jsonl"
+    - "data/raw/microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl"
+    - "data/raw/bookcorpus_books_train.jsonl"
+  
+  mixing_ratios:
+    fineweb_edu: 0.4
+    wikitext: 0.3
+    orca_math: 0.2
+    bookcorpus: 0.1
+  
+  # Reduced for memory efficiency
+  max_length: 512
+  train_split: 0.85
+  val_split: 0.15
+  shuffle: true
+
+# Training Configuration - GTX 1070 Optimized
+training:
+  # Basic training settings
+  epochs: 1                 # Just 1 epoch for testing
+  batch_size: 1
+  gradient_accumulation_steps: 64
+  
+  # Learning settings
+  learning_rate: 3e-5
+  warmup_steps: 200
+  max_steps: 2000
+  eval_steps: 250
+  save_steps: 500
+  
+  # Optimization
+  optimizer: "adamw"
+  scheduler: "cosine"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # Use LoRA for efficiency
+  training_type: "lora"
+  
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+
+# Optimizer Configuration
+optimizers:
+  primary: "adamw"          # Primary optimizer
+  secondary: "lion"         # Secondary optimizer for comparison
+  adamw:
+    lr: 0.00003
+    betas: [0.9, 0.999]
+    eps: 0.00000001
+    weight_decay: 0.01
+  lion:
+    lr: 0.00001
+    betas: [0.9, 0.99]
+    weight_decay: 0.01
+
+# Data Configuration
+data:
+  dataset: "dummy"          # Use dummy data for now
+  num_samples: 1000         # Small dataset for testing
+  seq_len: 512              # Sequence length
+  train_split: 0.85
+  val_split: 0.15
+  num_workers: 0            # No multiprocessing for testing
+
+# Metrics Configuration
+metrics:
+  log_interval: 50          # Log every N steps
+  metric_interval: 100      # Stream dial metrics every N steps
+  val_interval: 250         # Validate every N steps
+  save_interval: 500        # Save checkpoint every N steps
+
+# System Configuration
+system:
+  # Output directories
+  checkpoint_dir: "outputs/checkpoints"
+  log_dir: "outputs/logs"
+  metrics_dir: "outputs/metrics"
+  output_dir: "outputs"
+  
+  # Logging configuration
+  logging:
+    wandb: true
+    tensorboard: true
+    console_log_level: "INFO"
+  
+  # Hardware optimization for GTX 1070
+  mixed_precision: "fp16"
+  dataloader_num_workers: 0  # Avoid multiprocessing issues
+  pin_memory: false  # Better for older GPUs
+  device: "cuda"
+
+# Environment Configuration
+environment:
+  platform: "local"
+  
+  # Memory optimization
+  gradient_checkpointing: true
+  low_cpu_mem_usage: true
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 500  # Reduced for memory
+  generate_samples: 3
+
+# Chrono-MemBench Specific Settings
+chrono:
+  temporal_dropout:
+    enabled: true
+    initial_rate: 0.1
+    schedule: "cosine"
+    min_rate: 0.02
+  
+  route_sae:
+    enabled: true
+    latent_dim: 1024  # Reduced for Gemma-2B and memory constraints
+    sparsity_weight: 0.1
+    reconstruction_weight: 1.0
+    update_frequency: 100
+  
+  feature_alignment:
+    enabled: true
+    weight: 0.05
+    alignment_type: "attention_diversity"
+  
+  checkpointing:
+    checkpoint_every_n_steps: 500
+    max_checkpoints: 5  # Reduced to save disk space
+    save_features: true
+    save_sae_state: true
+  
+  monitoring:
+    wandb_project: "chrono-membench-gtx1070"
+    wandb_entity: null
+    dashboard_enabled: true
+    update_interval: 100
+
+# Experiment Configuration
+experiment:
+  name: "chrono-membench-gtx1070"
+  description: "GTX 1070 optimized training with memory efficiency"
+  tags: ["gtx1070", "8gb-vram", "memory-efficient"]
+  seed: 42
+  deterministic: true
+  max_memory_gb: 8
+  max_training_hours: 6

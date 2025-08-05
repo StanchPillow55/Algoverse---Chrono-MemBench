@@ -61,7 +61,7 @@ class ChronoSAETrainer:
         
         # Mixed precision setup
         if use_amp:
-            self.scaler = torch.cuda.amp.GradScaler()
+            self.scaler = torch.amp.GradScaler()
         else:
             self.scaler = None
             
@@ -82,9 +82,9 @@ class ChronoSAETrainer:
         batch = batch.to(self.device)
         
         if self.use_amp:
-            with torch.cuda.amp.autocast():
+            with torch.amp.autocast(device_type="cuda"):
                 outputs = self.model(batch, compute_loss=True)
-                loss = outputs['loss']
+            loss = outputs['loss']
         else:
             outputs = self.model(batch, compute_loss=True)
             loss = outputs['loss']
@@ -129,7 +129,7 @@ class ChronoSAETrainer:
                 batch = batch.to(self.device)
                 
                 if self.use_amp:
-                    with torch.cuda.amp.autocast():
+                    with torch.amp.autocast(device_type="cuda"):
                         outputs = self.model(batch, compute_loss=True)
                 else:
                     outputs = self.model(batch, compute_loss=True)

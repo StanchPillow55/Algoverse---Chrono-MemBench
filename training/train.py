@@ -27,7 +27,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim import AdamW
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
@@ -362,7 +362,7 @@ def train(
     optimizer = setup_optimizer(model, config)
     
     # Setup mixed precision
-    use_amp = system_config.get('mixed_precision', False) and torch.cuda.is_available()
+    use_amp = (system_config.get('mixed_precision') == "fp16") and torch.cuda.is_available()
     scaler = GradScaler() if use_amp else None
     
     # Create dataset and dataloaders
@@ -454,13 +454,16 @@ def train(
                 
                 # Forward pass with mixed precision
                 if use_amp:
-                    with autocast():
-                        result = training_loop.train_step(global_step, batch, batch)
+                    with autocast(device_type="cuda"):
+                        result = model(batch, compute_loss=True)
+                        loss = result['loss'] / gradient_accumulation_steps
+                    scaler.scale(loss).backward()
                 else:
-                    result = training_loop.train_step(global_step, batch, batch)
+                    result = model(batch, compute_loss=True)
+                    loss = result['loss'] / gradient_accumulation_steps
+                    loss.backward()
                 
-                loss = result['loss']
-                epoch_loss += loss
+                epoch_loss += loss.item() * gradient_accumulation_steps
                 num_batches += 1
                 
                 # Gradient accumulation
@@ -474,7 +477,7 @@ def train(
                         torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
                         optimizer.step()
                     
-                    optimizer.zero_grad()
+                    optimizer.zero_grad(set_to_none=True)
                 
                 # Logging
                 if is_main_process and global_step % log_interval == 0:
@@ -493,7 +496,7 @@ def train(
                             val_batch = val_batch.to(device)
                             
                             if use_amp:
-                                with autocast():
+                                with autocast(device_type="cuda"):
                                     val_result = model(val_batch, compute_loss=True)
                             else:
                                 val_result = model(val_batch, compute_loss=True)

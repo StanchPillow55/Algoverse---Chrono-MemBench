@@ -1,0 +1,98 @@
+# Dummy AMP Configuration for Smoke Testing
+# Quick test with minimal resources to verify AMP functionality
+
+# Model Configuration
+model:
+  d_model: 64               # Very small model for fast testing
+  d_sae: 256               # Small SAE expansion
+  temporal_dropout_p: 0.1
+  lambda_sparsity: 0.0001
+  beta_tpg: 0.0005
+
+# Data Configuration
+data:
+  dataset: "dummy"
+  num_samples: 100         # Minimal dataset
+  seq_len: 16              # Short sequences
+  train_split: 0.8
+  val_split: 0.2
+  num_workers: 0
+
+# Training Configuration
+training:
+  epochs: 1                # Single epoch
+  batch_size: 1
+  gradient_accumulation_steps: 2  # Small accumulation
+  learning_rate: 0.001
+  warmup_steps: 2
+  max_steps: 2             # Only 2 steps
+  eval_steps: 10
+  save_steps: 5
+  optimizer: "adamw"
+  scheduler: "cosine"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  training_type: "lora"
+  lora:
+    r: 4
+    alpha: 8
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj"]
+
+# Optimizer Configuration
+optimizers:
+  primary: "adamw"
+  secondary: "lion"
+  adamw:
+    lr: 0.001
+    betas: [0.9, 0.999]
+    eps: 0.00000001
+    weight_decay: 0.01
+  lion:
+    lr: 0.0003
+    betas: [0.9, 0.99]
+    weight_decay: 0.01
+
+# Metrics Configuration
+metrics:
+  log_interval: 1
+  metric_interval: 1
+  val_interval: 5
+  save_interval: 5
+
+# System Configuration
+system:
+  checkpoint_dir: "outputs/test_checkpoints"
+  log_dir: "outputs/test_logs"
+  metrics_dir: "outputs/test_metrics"
+  output_dir: "outputs/test"
+  logging:
+    wandb: false           # Disable wandb for testing
+    tensorboard: true
+    console_log_level: "INFO"
+  mixed_precision: "fp16"  # Enable AMP for testing
+  dataloader_num_workers: 0
+  pin_memory: false
+  device: "cuda"
+
+# Environment Configuration
+environment:
+  platform: "local"
+  gradient_checkpointing: false  # Disable for speed
+  low_cpu_mem_usage: true
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 10    # Minimal validation
+  generate_samples: 1
+
+# Experiment Configuration
+experiment:
+  name: "amp-smoke-test"
+  description: "AMP smoke test with minimal configuration"
+  tags: ["test", "amp", "smoke"]
+  seed: 42
+  deterministic: true
+  max_memory_gb: 2
+  max_training_hours: 0.1  # 6 minutes max
