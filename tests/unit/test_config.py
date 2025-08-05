@@ -42,12 +42,13 @@ class TestConfigurationFiles:
             # Skip config files with different structure
             skip_files = [
                 "platform_config.yaml", "common.yaml", 
-                "colab-t4-16g.yaml", "gtx1070-8g.yaml", "rtx6000-48g.yaml"
+                "colab-t4-16g.yaml", "gtx1070-8g.yaml", "rtx6000-48g.yaml",
+                "dummy_amp.yaml"  # Test-specific config with different structure
             ]
             if config_path.name in skip_files:
                 continue
     
-            with open(config_path, 'r') as f:
+            with open(config_path, 'r', encoding='utf-8') as f:
                 config = yaml.safe_load(f)
     
             # Basic structure checks
@@ -69,7 +70,7 @@ class TestConfigurationFiles:
             if config_path.name in ["platform_config.yaml", "base.yaml"]:
                 continue
                 
-            with open(config_path, 'r') as f:
+            with open(config_path, 'r', encoding='utf-8') as f:
                 config = yaml.safe_load(f)
             
             if 'model' not in config or 'paths' not in config['model']:
@@ -133,7 +134,7 @@ class TestConfigGeneration:
             # Verify generated config
             assert Path(macos_config_path).exists(), "Generated config file should exist"
             
-            with open(macos_config_path, 'r') as f:
+            with open(macos_config_path, 'r', encoding='utf-8') as f:
                 config = yaml.safe_load(f)
             
             # Should have paths section
