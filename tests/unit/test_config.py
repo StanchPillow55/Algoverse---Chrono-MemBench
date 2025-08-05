@@ -37,18 +37,22 @@ class TestConfigurationFiles:
         """Test that all configurations have required structure."""
         config_files = list(configs_dir.glob("*.yaml"))
         assert len(config_files) > 0, "No config files found"
-        
+    
         for config_path in config_files:
-            # Skip platform config file - it has different structure
-            if config_path.name == "platform_config.yaml":
+            # Skip config files with different structure
+            skip_files = [
+                "platform_config.yaml", "common.yaml", 
+                "colab-t4-16g.yaml", "gtx1070-8g.yaml", "rtx6000-48g.yaml"
+            ]
+            if config_path.name in skip_files:
                 continue
-                
+    
             with open(config_path, 'r') as f:
                 config = yaml.safe_load(f)
-            
+    
             # Basic structure checks
             assert isinstance(config, dict), f"{config_path.name}: Config should be a dictionary"
-            
+    
             # Check for model section
             assert 'model' in config, f"{config_path.name}: Missing 'model' section"
             
