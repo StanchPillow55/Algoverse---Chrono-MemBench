@@ -2,27 +2,31 @@
 
 🧠 **A Two-Phase Framework for Tracking and Steering Memory Features in Large Language Models**
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/StanchPillow55/Algoverse---Chrono-MemBench/blob/main/notebooks/chrono_membench_colab_universal.ipynb)
+![Version](https://img.shields.io/badge/version-0.2.0--chrono-blue)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![PyTorch](https://img.shields.io/badge/pytorch-2.0%2B-orange)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/bradleyharaguchi/Chrono-MemBench/blob/main/notebooks/01_quickstart.ipynb)
 
 ## 🚀 Quick Start
 
 ### Option 1: Google Colab (Recommended)
 ```bash
 # Open the notebook in Colab using the badge above
-# or manually: notebooks/chrono_membench_colab_universal.ipynb
+# or manually: notebooks/01_quickstart.ipynb
 ```
 
 ### Option 2: Local Training
 ```bash
 # Clone repository
-git clone https://github.com/StanchPillow55/Algoverse---Chrono-MemBench.git
-cd Algoverse---Chrono-MemBench
+git clone https://github.com/bradleyharaguchi/Chrono-MemBench.git
+cd Chrono-MemBench
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Quick training
-python src/chrono_cli.py quick-chrono gemma-2b
+python training/train.py --config configs/chrono_membench.yaml
 
 # macOS (Apple Silicon)
 python scripts/train_macos.py --config configs/chrono_membench.yaml
@@ -43,14 +47,21 @@ python scripts/train_macos.py --config configs/chrono_membench.yaml
 chrono-membench/
 ├── 📖 docs/                    # Documentation and guides
 ├── 📓 notebooks/               # Jupyter notebooks
-│   ├── chrono_membench_colab_universal.ipynb  # Main Colab notebook
-│   └── standard_training_colab.ipynb          # Standard training
+│   └── 01_quickstart.ipynb   # Main quickstart notebook
 ├── ⚙️  configs/                # Training configurations
-├── 🧠 src/                     # Source code
-│   ├── chrono/                # Core chrono-membench modules
-│   └── chrono_cli.py          # Command-line interface
+├── 🧠 src/algoverse/chrono/    # Source code
+│   ├── chrono_sae/            # ChronoSAE implementation
+│   ├── membench_x/            # Memory benchmarking
+│   └── training/              # Training utilities
+├── 🚂 training/                # Main training scripts
+│   ├── train.py               # Primary training script
+│   └── loop.py                # Training loop implementation
+├── 🧪 tests/                   # Test suite
+│   ├── smoke/                 # Smoke tests
+│   ├── unit/                  # Unit tests
+│   └── integration/           # Integration tests
 ├── 🔧 scripts/                # Utility scripts
-├── 📊 data/                   # Datasets and models (DVC managed)
+├── 📦 legacy/                 # Legacy code (archived)
 └── 📋 requirements.txt        # Dependencies
 ```
 
@@ -82,14 +93,23 @@ All documentation is in the [`docs/`](docs/) directory:
 ## 🛠️ Development
 
 ```bash
-# Run tests
-python scripts/test_config_fix.py
+# Run all tests
+pytest -q
+
+# Run smoke tests only
+pytest tests/smoke/
+
+# Run unit tests only
+pytest tests/unit/
 
 # Check macOS setup
 python scripts/train_macos.py --check_only
 
-# List available configs
-python src/chrono_cli.py list-configs
+# Find orphaned files
+python scripts/find_orphans.py
+
+# Test configuration files
+python scripts/test_config_fix.py
 ```
 
 ## 📊 Monitoring
@@ -100,11 +120,26 @@ python src/chrono_cli.py list-configs
 
 ## 🤝 Contributing
 
-We welcome contributions! Please:
-1. Check existing issues and documentation
-2. Test your changes with the provided test scripts
-3. Update documentation in `docs/` directory
-4. Follow the existing code style
+We welcome contributions! Please follow this workflow:
+
+1. **Fork and Clone**: Fork the repository and clone your fork
+2. **Create Branch**: Create a feature branch from `main`
+3. **Make Changes**: Implement your changes following existing patterns
+4. **Test**: Run the full test suite:
+   ```bash
+   pytest -q                    # All tests
+   pytest tests/smoke/          # Quick smoke tests
+   pytest tests/unit/           # Unit tests
+   ```
+5. **Documentation**: Update relevant documentation in `docs/`
+6. **Commit**: Use clear, descriptive commit messages
+7. **Push**: Push to your fork and create a pull request
+
+### Development Guidelines
+- Follow existing code style and patterns
+- Add tests for new functionality
+- Update documentation for user-facing changes
+- Check for orphaned files with `python scripts/find_orphans.py`
 
 ## 📄 License
 
