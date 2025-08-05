@@ -1,0 +1,52 @@
+# Platform-specific configuration template
+# Copy and modify for your specific platform
+
+# macOS (M2 CPU) Configuration
+macos:
+  device: "mps"  # Use Metal Performance Shaders
+  precision: "float32"  # MPS doesn't support all float16 operations
+  batch_size: 4  # Smaller batch for CPU/MPS
+  gradient_accumulation_steps: 8  # Compensate with more accumulation
+  dataloader_num_workers: 2  # Conservative for Mac
+  mixed_precision: false  # Disable for MPS compatibility
+  
+  # Optimization flags
+  use_flash_attention: false  # Not available on macOS
+  use_triton: false  # Not available on macOS
+  compile_model: false  # PyTorch compile may be unstable on MPS
+
+# Windows (GTX 1070) Configuration  
+windows_gtx1070:
+  device: "cuda"
+  precision: "float16"  # Use mixed precision for memory efficiency
+  batch_size: 8  # GTX 1070 has 8GB VRAM
+  gradient_accumulation_steps: 4
+  dataloader_num_workers: 4
+  mixed_precision: true
+  
+  # GPU-specific optimizations
+  use_flash_attention: true  # Available on CUDA
+  use_triton: true  # Available on CUDA
+  compile_model: false  # GTX 1070 is older architecture (cc 6.1)
+  
+  # Memory management
+  gradient_checkpointing: true  # Save VRAM
+  empty_cache_steps: 100  # Clear cache periodically
+
+# Linux (RTX 4090) Configuration - for future use
+linux_rtx4090:
+  device: "cuda"
+  precision: "bfloat16"  # Better numerical stability
+  batch_size: 32  # RTX 4090 has 24GB VRAM
+  gradient_accumulation_steps: 1
+  dataloader_num_workers: 8
+  mixed_precision: true
+  
+  # Full optimization suite
+  use_flash_attention: true
+  use_triton: true
+  compile_model: true  # RTX 4090 supports latest features
+  
+  # Performance optimizations
+  gradient_checkpointing: false  # Plenty of VRAM
+  empty_cache_steps: 1000

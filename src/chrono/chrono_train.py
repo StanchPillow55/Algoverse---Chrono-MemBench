@@ -174,7 +174,7 @@ class ChronoTrainer(Trainer):
                 config=self.chrono_config.__dict__
             )
     
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         """Enhanced loss computation with SAE and feature alignment."""
         # Standard language modeling loss
         outputs = model(**inputs)
@@ -233,7 +233,7 @@ class ChronoTrainer(Trainer):
         
         return total_loss
     
-    def training_step(self, model, inputs):
+    def training_step(self, model, inputs, num_items_in_batch=None):
         """Enhanced training step with temporal dropout."""
         # Update temporal dropout rate
         current_step = self.state.global_step
@@ -248,7 +248,10 @@ class ChronoTrainer(Trainer):
                     module.p = dropout_rate
         
         # Standard training step
-        return super().training_step(model, inputs)
+        if num_items_in_batch is not None:
+            return super().training_step(model, inputs, num_items_in_batch)
+        else:
+            return super().training_step(model, inputs)
     
     def evaluate(self, eval_dataset=None, ignore_keys=None, metric_key_prefix="eval"):
         """Enhanced evaluation with chrono-membench metrics."""
@@ -380,7 +383,8 @@ class ChronoMemBenchTrainer:
             dataset_config,
             tokenizer,
             batch_size=self.config['training']['batch_size'],
-            num_workers=self.config['environment']['dataloader_num_workers']
+            num_workers=self.config['environment']['dataloader_num_workers'],
+            pin_memory=self.config['environment']['pin_memory']
         )
         
         # Create training arguments
@@ -391,13 +395,13 @@ class ChronoMemBenchTrainer:
             per_device_train_batch_size=self.config['training']['batch_size'],
             per_device_eval_batch_size=self.config['training']['batch_size'],
             gradient_accumulation_steps=self.config['training']['gradient_accumulation_steps'],
-            learning_rate=self.config['training']['learning_rate'],
-            weight_decay=self.config['training']['weight_decay'],
+            learning_rate=float(self.config['training']['learning_rate']),
+            weight_decay=float(self.config['training']['weight_decay']),
             warmup_steps=self.config['training']['warmup_steps'],
             logging_steps=50,
             eval_steps=self.config['training']['eval_steps'],
             save_steps=self.config['training']['save_steps'],
-            evaluation_strategy="steps",
+            eval_strategy="steps",
             save_strategy="steps",
             save_total_limit=self.chrono_config.max_checkpoints,
             fp16=self.config['environment']['mixed_precision'] == 'fp16',

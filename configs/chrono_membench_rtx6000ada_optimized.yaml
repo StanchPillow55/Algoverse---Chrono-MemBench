@@ -1,0 +1,359 @@
+# Chrono-MemBench RTX 6000 Ada Optimized Configuration
+# ===================================================
+# 
+# This configuration is optimized for RTX 6000 Ada 48GB GPU training.
+# 
+# Key optimizations:
+# - Batch size 2 with gradient accumulation 8 (effective batch size 16)
+# - bf16 mixed precision for better performance on RTX 6000 Ada
+# - Flash-Attention 2 enabled for memory efficiency
+# - AdamW torch fused optimizer for speed
+# - Gradient checkpointing enabled
+# - Higher LoRA rank (64) for better adaptation
+# - Optimized for 48GB VRAM with memory-efficient patterns
+
+# Model Configuration
+model:
+  type: "gemma-2b"
+  source: "huggingface"
+  model_name_or_path: "google/gemma-2-2b-it"
+  
+  # Model paths for different sources
+  paths:
+    gemma-2b:
+      local: "data/models/gemma-2b"
+      huggingface: "google/gemma-2-2b-it"
+  
+  # Model loading optimizations
+  torch_dtype: "bfloat16"
+  trust_remote_code: true
+  use_fast_tokenizer: true
+  device_map: "auto"
+
+# Dataset Configuration
+dataset:
+  # Dataset mixing ratios optimized for educational content
+  mixing_ratios:
+    fineweb_edu: 0.6      # 60% educational content
+    wikitext: 0.2         # 20% Wikipedia
+    orca_math: 0.15       # 15% math problems
+    bookcorpus: 0.05      # 5% books
+  
+  # Context length - RTX 6000 Ada can handle longer sequences
+  max_length: 2048
+  
+  # Preprocessing optimizations
+  preprocessing:
+    num_workers: 16       # More workers for faster preprocessing
+    batch_size: 1000      # Larger batch for preprocessing
+    pin_memory: true
+    prefetch_factor: 2
+  
+  # Data loading optimizations
+  streaming: false        # Load full dataset to memory (48GB allows this)
+  cache_dir: "./cache"
+  remove_columns: ["attention_mask"]  # Remove unnecessary columns
+
+# Training Configuration - Optimized for RTX 6000 Ada 48GB
+training:
+  # === Batch Configuration ===
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 8    # Effective batch size: 2 * 8 = 16
+  
+  # === Precision and Memory ===
+  bf16: true                        # RTX 6000 Ada supports bf16 natively
+  fp16: false
+  gradient_checkpointing: true      # Enable for memory efficiency
+  dataloader_pin_memory: true
+  dataloader_num_workers: 8
+  
+  # === Optimization ===
+  optim: "adamw_torch_fused"        # Fused optimizer for speed
+  learning_rate: 2e-5
+  weight_decay: 0.01
+  lr_scheduler_type: "cosine"
+  warmup_steps: 500
+  max_grad_norm: 1.0
+  
+  # === Training Schedule ===
+  max_steps: 10000
+  eval_steps: 200
+  save_steps: 200
+  logging_steps: 10
+  
+  # === LoRA Configuration ===
+  training_type: "lora"
+  lora:
+    r: 64                          # Higher rank for better performance
+    alpha: 128                     # Alpha = 2 * r
+    dropout: 0.1
+    target_modules:
+      - "q_proj"
+      - "v_proj"
+      - "k_proj"
+      - "o_proj"
+      - "gate_proj"
+      - "up_proj"
+      - "down_proj"
+    lora_alpha: 128
+    lora_dropout: 0.1
+    bias: "none"
+    task_type: "CAUSAL_LM"
+  
+  # === Monitoring and Logging ===
+  report_to: ["wandb"]
+  logging_dir: "./logs"
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  
+  # === Stability and Performance ===
+  remove_unused_columns: false
+  prediction_loss_only: false
+  skip_memory_metrics: false
+  
+  # === Evaluation ===
+  evaluation_strategy: "steps"
+  eval_accumulation_steps: 4
+  
+  # === Saving ===
+  save_strategy: "steps"
+  save_safetensors: true
+  
+  # === Advanced Training Options ===
+  group_by_length: true            # Group sequences by length for efficiency
+  length_column_name: "length"
+  auto_find_batch_size: false      # Disable auto batch size finding
+  
+  # === Regularization ===
+  label_smoothing_factor: 0.0
+  
+  # === Gradient and Optimization ===
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1e-8
+  
+  # === Learning Rate Schedule ===
+  lr_scheduler_kwargs:
+    T_max: 10000
+    eta_min: 1e-6
+
+# Environment Configuration
+environment:
+  platform: "runpod"
+  gpu_type: "rtx_6000_ada"
+  mixed_precision: "bf16"
+  attention_implementation: "flash_attention_2"
+  compile_mode: "disabled"          # Disable torch.compile for stability
+  memory_efficient_attention: true
+  use_fast_tokenizer: true
+  
+  # Memory management
+  max_memory_allocation: "46GB"     # Leave 2GB for system
+  empty_cache_steps: 100           # Clear cache every 100 steps
+  
+  # Performance optimizations
+  cudnn_benchmark: true
+  cudnn_deterministic: false
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["perplexity", "loss"]
+  eval_dataset_size: 2000
+  generate_samples: 5
+  eval_accumulation_steps: 4
+  
+  # Generation parameters for evaluation
+  generation_config:
+    max_length: 512
+    num_beams: 1
+    do_sample: true
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    pad_token_id: 0
+    eos_token_id: 1
+
+# RTX 6000 Ada Specific Optimizations
+rtx6000ada_optimizations:
+  enable_flash_attention: true
+  use_fused_adamw: true
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  enable_gradient_checkpointing: true
+  max_memory_allocation: "46GB"
+  enable_cpu_offload: false        # Not needed with 48GB VRAM
+  use_deepspeed: false            # Single GPU training
+  enable_xformers: true
+  
+  # Memory optimizations
+  gradient_checkpointing_kwargs:
+    use_reentrant: false
+  
+  # Attention optimizations
+  attention_dropout: 0.0
+  use_scaled_dot_product_attention: true
+  
+  # Compilation settings
+  torch_compile: false            # Disabled for stability
+  compile_mode: "disabled"
+  
+  # CUDA optimizations
+  cuda_graphs: false              # May cause issues with dynamic shapes
+  channels_last: false            # Not beneficial for transformer models
+
+# Monitoring Configuration
+monitoring:
+  wandb:
+    project: "chrono-membench-rtx6000ada"
+    entity: null                  # Will use default entity
+    tags: ["rtx6000ada", "gemma-2b", "lora", "bf16"]
+    notes: "RTX 6000 Ada optimized training with bf16 and Flash-Attention 2"
+    
+  tensorboard:
+    log_dir: "./logs"
+    
+  # Custom metrics to track
+  custom_metrics:
+    - "gpu_memory_usage"
+    - "tokens_per_second"
+    - "effective_batch_size"
+    - "gradient_norm"
+
+# Checkpointing Configuration
+checkpointing:
+  save_strategy: "steps"
+  save_steps: 200
+  save_total_limit: 3
+  load_best_model_at_end: true
+  
+  # Resume training configuration
+  resume_from_checkpoint: null
+  ignore_data_skip: false
+  
+  # Checkpoint compression
+  save_safetensors: true
+  
+  # Backup configuration
+  backup_checkpoints: true
+  backup_dir: "./checkpoint_backups"
+
+# Hardware-Specific Settings
+hardware:
+  gpu_memory_fraction: 0.95       # Use 95% of GPU memory
+  allow_memory_growth: true
+  
+  # CPU settings
+  cpu_threads: 32                 # Adjust based on your CPU
+  cpu_memory_limit: "64GB"        # Adjust based on your RAM
+  
+  # I/O optimizations
+  io_threads: 8
+  prefetch_factor: 2
+  persistent_workers: true
+
+# Debugging and Logging
+debug:
+  log_level: "INFO"
+  log_on_each_node: false
+  disable_tqdm: false
+  
+  # Memory debugging
+  log_memory_usage: true
+  memory_log_interval: 50
+  
+  # Performance profiling
+  profile_steps: null             # Set to number to enable profiling
+  profile_memory: false
+  
+  # Gradient debugging
+  log_gradient_norm: true
+  detect_anomaly: false           # Enable for debugging NaN/Inf
+
+# Output Configuration
+output:
+  output_dir: "./outputs"
+  run_name: null                  # Will be auto-generated
+  overwrite_output_dir: false
+  
+  # Model saving
+  save_model_every_n_steps: 200
+  save_optimizer_state: true
+  save_scheduler_state: true
+  
+  # Predictions and generations
+  save_predictions: true
+  save_generations: true
+  
+  # Logs and metrics
+  save_logs: true
+  save_metrics: true
+
+# Data Processing Configuration
+data_processing:
+  # Tokenization settings
+  tokenizer:
+    padding: "max_length"
+    truncation: true
+    max_length: 2048
+    return_tensors: "pt"
+    
+  # Data collation
+  data_collator: "default"
+  
+  # Preprocessing
+  preprocessing_num_workers: 16
+  preprocessing_batch_size: 1000
+  
+  # Caching
+  cache_dir: "./cache"
+  cached_datasets: true
+  
+  # Streaming and buffering
+  streaming: false
+  buffer_size: 10000
+
+# Advanced Configuration
+advanced:
+  # Automatic mixed precision
+  amp:
+    enabled: true
+    opt_level: "O1"
+    loss_scale: "dynamic"
+    
+  # Gradient accumulation
+  gradient_accumulation:
+    enabled: true
+    steps: 8
+    
+  # Learning rate finder
+  lr_finder:
+    enabled: false
+    start_lr: 1e-8
+    end_lr: 1e-1
+    num_training_steps: 100
+    
+  # Early stopping
+  early_stopping:
+    enabled: false
+    patience: 3
+    min_delta: 0.001
+    
+  # Model averaging
+  model_averaging:
+    enabled: false
+    decay: 0.999
+    
+  # Regularization techniques
+  regularization:
+    dropout: 0.1
+    attention_dropout: 0.0
+    activation_dropout: 0.0
+    
+  # Quantization (for inference)
+  quantization:
+    enabled: false
+    bits: 8
+    group_size: 128

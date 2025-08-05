@@ -1,0 +1,168 @@
+# Chrono-MemBench Configuration - T4 GPU Optimized
+# Optimized for Google Colab T4 GPU with 16GB VRAM
+
+# Model Configuration
+model:
+  type: "gemma-2b"
+  source: "huggingface"
+  model_name_or_path: "google/gemma-2-2b-it"  # Use instruct model for better performance
+  
+  paths:
+    gemma-2b:
+      local: "data/models/gemma-2b"
+      huggingface: "google/gemma-2-2b-it"
+
+# Dataset Configuration - T4 Optimized
+dataset:
+  sources:
+    - "data/raw/HuggingFaceFW_fineweb_edu_edu_web_train.jsonl"
+    - "data/raw/wikitext_wiki103_train.jsonl"
+    - "data/raw/microsoft_orca_math_word_problems_200k_math_reasoning_train.jsonl"
+    - "data/raw/bookcorpus_books_train.jsonl"
+  
+  # Optimized mixing ratios for faster convergence
+  mixing_ratios:
+    fineweb_edu: 0.4      # Educational content
+    wikitext: 0.3         # Wikipedia
+    orca_math: 0.2        # Math reasoning
+    bookcorpus: 0.1       # Narrative content
+  
+  # T4-optimized sequence length
+  max_length: 512         # Optimal for T4 memory/speed balance
+  train_split: 0.9        # More training data
+  val_split: 0.1
+  shuffle: true
+  
+  # Data loading optimizations
+  preprocessing_num_workers: 4
+
+# Training Configuration - T4 GPU Optimized
+training:
+  # OPTIMIZED BATCH CONFIGURATION for T4
+  per_device_train_batch_size: 4      # 4x larger than current
+  per_device_eval_batch_size: 8       # Even larger for eval
+  gradient_accumulation_steps: 2      # Reduced for faster feedback
+  # Effective batch size = 4 * 2 = 8 (same as current but faster)
+  
+  # OPTIMIZED LEARNING CONFIGURATION
+  learning_rate: 5e-5     # Slightly higher for faster convergence
+  warmup_steps: 100       # Reduced warmup for faster start
+  max_steps: 3000         # Reduced for faster experimentation
+  eval_steps: 150         # More frequent evaluation
+  save_steps: 300         # More frequent saves
+  logging_steps: 10       # Frequent logging for monitoring
+  
+  # OPTIMIZATION SETTINGS
+  optimizer: "adamw_torch"              # Optimized AdamW
+  lr_scheduler_type: "cosine"           # Cosine schedule
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # MEMORY OPTIMIZATIONS
+  fp16: true                           # ✅ CRITICAL: Enable FP16
+  gradient_checkpointing: true         # ✅ Save memory
+  dataloader_drop_last: true          # Consistent batch sizes
+  remove_unused_columns: false        # Keep for debugging
+  
+  # LORA CONFIGURATION - Optimized for speed
+  use_lora: true
+  lora_r: 16                          # Lower rank = faster
+  lora_alpha: 32                      # 2x rank
+  lora_dropout: 0.05                  # Lower dropout = more stable
+  lora_target_modules:
+    - "q_proj"
+    - "v_proj" 
+    - "k_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  
+  # MONITORING
+  report_to: ["wandb"]
+
+# Environment Configuration - T4 Optimized
+environment:
+  platform: "colab"
+  
+  # T4 GPU OPTIMIZATIONS
+  mixed_precision: "fp16"             # ✅ CRITICAL: Enable FP16
+  dataloader_num_workers: 2           # ✅ Parallel data loading
+  dataloader_pin_memory: true         # ✅ Faster GPU transfers
+  torch_compile: false                # Disable for compatibility
+  
+  # OUTPUT CONFIGURATION
+  output_dir: "outputs/chrono_t4"
+  checkpoint_dir: "outputs/chrono_t4/checkpoints"
+  log_dir: "outputs/chrono_t4/logs"
+  
+  # LOGGING
+  logging:
+    wandb: true                       # Enable W&B for monitoring
+    tensorboard: false                # Disable to save resources
+    console_log_level: "INFO"
+
+# Evaluation Configuration - T4 Optimized
+evaluation:
+  metrics: ["perplexity", "loss"]     # Simplified metrics for speed
+  eval_dataset_size: 1000            # Reasonable eval set
+  generate_samples: 5                # Generate samples for quality check
+  eval_accumulation_steps: 2         # Batch eval for memory efficiency
+
+# Chrono-MemBench Specific Settings - Simplified for Speed
+chrono:
+  # SIMPLIFIED TEMPORAL DROPOUT
+  temporal_dropout:
+    enabled: true
+    initial_rate: 0.1                 # Lower rate for stability
+    schedule: "linear"                # Simpler schedule
+    min_rate: 0.02
+  
+  # SIMPLIFIED ROUTE-SAE 
+  route_sae:
+    enabled: false                    # ❌ DISABLE for speed during dev
+    # Re-enable later: latent_dim: 1024, sparsity_weight: 0.05
+  
+  # SIMPLIFIED FEATURE ALIGNMENT
+  feature_alignment:
+    enabled: false                    # ❌ DISABLE for speed during dev
+  
+  # OPTIMIZED CHECKPOINTING
+  checkpointing:
+    checkpoint_every_n_steps: 300    # Match save_steps
+    max_checkpoints: 5               # Fewer checkpoints to save space
+    save_features: false             # Disable to save space/time
+    save_sae_state: false            # Disable to save space/time
+  
+  # SIMPLIFIED MONITORING
+  temporal_purity:
+    enabled: false                   # ❌ DISABLE for speed during dev
+  
+  monitoring:
+    wandb_project: "chrono-membench-t4"
+    dashboard_enabled: true
+    update_interval: 50              # More frequent updates
+    
+    # ESSENTIAL METRICS ONLY
+    track_metrics:
+      - "loss"
+      - "learning_rate"
+      - "train_samples_per_second"
+
+# Experimental settings - T4 Optimized
+experiment:
+  name: "chrono-membench-t4-optimized"
+  description: "T4 GPU optimized training with FP16, larger batches, and simplified features"
+  tags: ["t4-optimized", "fp16", "fast-training", "gemma-2b"]
+  
+  # REPRODUCIBILITY
+  seed: 42
+  deterministic: false               # Allow non-deterministic for speed
+  
+  # T4 RESOURCE LIMITS
+  max_memory_gb: 15                  # T4 has 16GB, leave 1GB buffer
+  max_training_hours: 2              # Shorter runs for experimentation
+  
+  # ABLATION DISABLED FOR SPEED
+  ablation:
+    enabled: false

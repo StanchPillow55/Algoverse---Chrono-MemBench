@@ -208,7 +208,8 @@ def create_data_loaders(
     batch_size: int = 4,
     num_workers: int = 2,
     base_path: str = "",
-    total_samples: Optional[int] = None
+    total_samples: Optional[int] = None,
+    pin_memory: bool = False
 ) -> tuple:
     """Create training and validation data loaders."""
     
@@ -235,7 +236,7 @@ def create_data_loaders(
         batch_size=batch_size,
         shuffle=config.shuffle,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=pin_memory
     )
     
     val_loader = DataLoader(
@@ -243,7 +244,7 @@ def create_data_loaders(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=pin_memory
     )
     
     return train_loader, val_loader

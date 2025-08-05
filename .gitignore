@@ -155,3 +155,17 @@ configs/temp_*.yaml
 
 # Hugging Face cache
 .hf_cache/
+
+# Legacy directories (migration cleanup)
+scripts/legacy/
+notebooks/legacy/
+
+# Platform-specific generated configs
+configs/*_generated.yaml
+configs/macos_*.yaml
+configs/windows_*.yaml
+configs/linux_*.yaml
+
+# Environment files
+.env.local
+.env.*.local

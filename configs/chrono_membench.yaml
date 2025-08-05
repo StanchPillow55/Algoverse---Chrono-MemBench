@@ -30,7 +30,7 @@ dataset:
     bookcorpus: 0.1       # 10% books - narrative/literary features
   
   # Enhanced data processing for chrono-membench
-  max_length: 2048
+  max_length: 512        # Further reduce sequence length to save memory
   train_split: 0.85      # Slightly more training data
   val_split: 0.15        # More validation for better temporal purity measurements
   shuffle: true
@@ -38,8 +38,8 @@ dataset:
 # Training Configuration - Optimized for temporal analysis
 training:
   # Batch configuration
-  batch_size: 2          # Smaller batch for memory efficiency with SAE
-  gradient_accumulation_steps: 16  # Maintain effective batch size
+  batch_size: 1          # Further reduce batch size to alleviate memory issues
+  gradient_accumulation_steps: 8   # Reduce accumulation steps for memory efficiency
   
   # Learning configuration
   learning_rate: 3e-5    # Lower learning rate for stable temporal features
@@ -75,13 +75,13 @@ environment:
   
   # Logging configuration
   logging:
-    wandb: true         # Enable wandb for dashboard
+    wandb: false        # Disable wandb to avoid network issues
     tensorboard: true   # Also keep tensorboard
     console_log_level: "INFO"
   
   # Hardware optimization
-  mixed_precision: "fp16"    # Use fp16 for MPS compatibility
-  dataloader_num_workers: 4  # Good for M1/M2 chips
+  mixed_precision: "no"      # Disable mixed precision for MPS compatibility
+  dataloader_num_workers: 0  # Set to 0 to avoid multiprocessing issues
   pin_memory: false          # Set to false for MPS
   device: "mps"              # Use MPS for Apple Silicon
 
