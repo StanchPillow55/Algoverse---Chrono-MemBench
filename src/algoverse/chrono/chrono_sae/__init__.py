@@ -15,4 +15,10 @@ from . import analysis
 from . import utils
 from . import config
 
-__all__ = ["models", "training", "analysis", "utils", "config"]
+# Import main classes for easy access
+from .model import ChronoSAE, ChronoSAEConfig, TemporalDropoutGate, create_chrono_sae
+
+__all__ = [
+    "models", "training", "analysis", "utils", "config",
+    "ChronoSAE", "ChronoSAEConfig", "TemporalDropoutGate", "create_chrono_sae"
+]
