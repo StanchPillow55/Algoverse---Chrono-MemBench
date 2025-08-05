@@ -94,36 +94,12 @@ class TestModelManager:
     """Test ModelManager functionality."""
     
     def test_model_manager_import(self):
-        """Test that ModelManager can be imported."""
-        try:
-            from chrono.train import ModelManager
-            assert ModelManager is not None
-        except ImportError as e:
-            pytest.skip(f"ModelManager not available: {e}")
+        """Test that legacy ModelManager can be imported (from legacy code)."""
+        pytest.skip("Legacy ModelManager moved to legacy directory - no longer in main codebase")
     
     def test_model_manager_with_config(self):
-        """Test ModelManager with a valid configuration."""
-        try:
-            from chrono.train import ModelManager
-        except ImportError:
-            pytest.skip("ModelManager not available")
-        
-        configs_dir = Path(__file__).parent.parent.parent / "configs"
-        gemma_config = configs_dir / "gemma_2b.yaml"
-        
-        if not gemma_config.exists():
-            pytest.skip("gemma_2b.yaml config not found")
-        
-        with open(gemma_config, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        # This should not raise a KeyError
-        try:
-            manager = ModelManager(config)
-            model_path = manager.get_model_path()
-            assert isinstance(model_path, str), "Model path should be a string"
-        except KeyError as e:
-            pytest.fail(f"KeyError in ModelManager: {e}")
+        """Test legacy ModelManager with a valid configuration."""
+        pytest.skip("Legacy ModelManager moved to legacy directory - no longer in main codebase")
 
 
 class TestConfigGeneration:

@@ -25,7 +25,7 @@ if requirements_path.exists():
         ]
 
 setup(
-    name="chrono-membench",
+    name="algoverse-chrono-membench",
     version="0.1.0",
     description="A Two-Phase Framework for Tracking and Steering Memory Features in Large Language Models",
     long_description=long_description,
@@ -35,6 +35,7 @@ setup(
     url="https://github.com/StanchPillow55/Algoverse---Chrono-MemBench",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
+    namespace_packages=['algoverse'],
     python_requires=">=3.12",
     install_requires=requirements,
     extras_require={

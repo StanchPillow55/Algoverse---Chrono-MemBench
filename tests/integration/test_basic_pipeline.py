@@ -14,18 +14,24 @@ sys.path.insert(0, str(src_path))
 class TestBasicPipeline:
     """Test basic pipeline integration."""
     
-    def test_chrono_sae_import(self):
-        """Test that chrono_sae package can be imported."""
+    def test_algoverse_chrono_import(self):
+        """Test that algoverse.chrono packages can be imported."""
         try:
-            import chrono_sae
+            from algoverse.chrono import chrono_sae
+            from algoverse.chrono import membench_x
+            from algoverse.chrono import training
+            
             assert chrono_sae.__version__ == "0.1.0"
             assert hasattr(chrono_sae, 'models')
             assert hasattr(chrono_sae, 'training')
             assert hasattr(chrono_sae, 'analysis')
             assert hasattr(chrono_sae, 'utils')
             assert hasattr(chrono_sae, 'config')
+            
+            assert membench_x.__version__ == "0.1.0"
+            assert training.__version__ == "0.1.0"
         except ImportError as e:
-            pytest.fail(f"Failed to import chrono_sae: {e}")
+            pytest.fail(f"Failed to import algoverse.chrono: {e}")
     
     def test_platform_detection(self):
         """Test platform-specific setup detection."""

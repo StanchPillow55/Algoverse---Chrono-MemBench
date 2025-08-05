@@ -2,6 +2,8 @@
 Chrono-SAE: Sparse Autoencoder for tracking and steering memory features in LLMs.
 
 A Two-Phase Framework for Tracking and Steering Memory Features in Large Language Models.
+
+This module is part of the algoverse.chrono namespace package.
 """
 
 __version__ = "0.1.0"

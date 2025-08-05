@@ -51,14 +51,27 @@ def test_config_loading():
     assert isinstance(config, dict), "Config should be a dictionary"
 
 
-def test_chrono_imports():
-    """Test that chrono modules can be imported."""
+def test_algoverse_chrono_imports():
+    """Test that algoverse.chrono modules can be imported."""
     try:
-        from chrono import train
-        from chrono import data_loader
-        assert True
+        from algoverse.chrono import chrono_sae
+        from algoverse.chrono import membench_x
+        from algoverse.chrono import training
+        
+        # Test chrono_sae imports
+        assert chrono_sae.__version__ == "0.1.0"
+        assert hasattr(chrono_sae, 'models')
+        assert hasattr(chrono_sae, 'training')
+        assert hasattr(chrono_sae, 'analysis')
+        assert hasattr(chrono_sae, 'utils')
+        assert hasattr(chrono_sae, 'config')
+        
+        # Test other modules exist
+        assert membench_x.__version__ == "0.1.0"
+        assert training.__version__ == "0.1.0"
+        
     except ImportError as e:
-        pytest.fail(f"Chrono imports failed: {e}")
+        pytest.fail(f"Algoverse chrono imports failed: {e}")
 
 
 def test_gpu_detection():
